@@ -3,7 +3,7 @@
 Synchronize files based on self-managed version comparison, automatically
 incrementing version numbers.
 
-基于本地日志文件实现文件同步的自管理，并实现版本号自增。
+基于本地日志实现文件同步的自管理，并实现版本号自增。
 
 ![image01.png](https://static.kephp.com/assets/ver-sync/image01.png)
 
@@ -12,7 +12,7 @@ incrementing version numbers.
 指定一个待同步目录，指定一个日志文件路径（json 格式，文件初始不存在也没问题）
 
 ```ts
-import { sync } from 'ver-sync';
+import sync from 'ver-sync';
 
 sync({
   cwd: process.cwd(),
@@ -78,7 +78,7 @@ sync({
 并没有实际保存，只是模拟延时保存操作。
 
 ```ts
-import { sync, syncFiles } from 'ver-sync';
+import sync, { syncFiles } from 'ver-sync';
 
 function getRandomInt(min: number, max: number) {
   const minCeiled = Math.ceil(min);
