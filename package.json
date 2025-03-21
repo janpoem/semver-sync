@@ -1,0 +1,19 @@
+{
+  "name": "ver-sync-repo",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@biomejs/biome": "latest",
+    "rollup": "^4.34.8",
+    "rollup-plugin-swc3": "^0.12.1",
+    "rollup-plugin-dts": "^6.2.1",
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": true,
+  "workspaces": ["packages/*"]
+}
