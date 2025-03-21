@@ -1,5 +1,5 @@
 import { sync } from 'ver-sync';
-import { storeQiniu } from './index';
+import storeQiniu from './index';
 
 sync({
   cwd: process.cwd(),

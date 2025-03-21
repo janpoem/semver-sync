@@ -38,7 +38,10 @@
   },
   "scripts": {
     "sync:test": "bun src/sync.test.ts",
-    "build": "bunx --bun rollup -c rollup.config.ts"
+    "lint": "biome lint --error-on-warnings ./src",
+    "ts-check": "bunx --bun tsc --noEmit",
+    "rollup": "bunx --bun rollup -c rollup.config.ts",
+    "build": "bun run lint && bun run ts-check && bun run rollup"
   },
   "dependencies": {
     "@zenstone/ts-utils": "^0.0.10",
