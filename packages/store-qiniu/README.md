@@ -1,10 +1,10 @@
-# @ver-sync/store-qiniu
+# @semver-sync/store-qiniu
 
 七牛云存储的实现。
 
 ```ts
-import sync from 'ver-sync';
-import storeQiniu from '@ver-sync/store-qiniu';
+import sync from '@semver-sync/sync';
+import storeQiniu from '@semver-sync/store-qiniu';
 
 sync({
   cwd: process.cwd(),
@@ -39,7 +39,7 @@ https 开头。
 假定配置里的 baseUrl 为：`http://domain.com/path`
 
 ```ts
-import storeQiniu from '@ver-sync/store-qiniu';
+import storeQiniu from '@semver-sync/store-qiniu';
 
 storeQiniu({
   key: 'repo-name',

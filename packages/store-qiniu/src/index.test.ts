@@ -1,4 +1,4 @@
-import { sync } from 'ver-sync';
+import { sync } from '@semver-sync/sync';
 import storeQiniu from './index';
 
 sync({

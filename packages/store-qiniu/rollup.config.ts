@@ -14,7 +14,7 @@ const rmdir = (dir: string) =>
   fs.statSync(dir).isDirectory() &&
   fs.rmSync(dir, { recursive: true });
 
-const external = ['ansi-colors', 'ver-sync', 'qiniu'];
+const external = ['ansi-colors', '@semver-sync/sync', 'qiniu'];
 
 const fmtCurry = (dir: string, jsExt: string, dtsExt: string) => ({
   js: (path: string) => join(outputDir, dir, `${path}${jsExt}`),

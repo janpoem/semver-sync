@@ -1,5 +1,5 @@
 {
-  "name": "ver-sync-repo",
+  "name": "@semver-sync/repo",
   "module": "index.ts",
   "type": "module",
   "devDependencies": {

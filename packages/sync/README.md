@@ -1,18 +1,18 @@
-# ver-sync
+# @semver-sync/sync
 
 Synchronize files based on self-managed version comparison, automatically
 incrementing version numbers.
 
 基于本地日志实现文件同步的自管理，并实现版本号自增。
 
-![image01.png](https://static.kephp.com/assets/ver-sync/image01.png)
+![image01.png](https://static.kephp.com/assets/semver-sync/image01.png)
 
 ## 使用说明
 
 指定一个待同步目录，指定一个日志文件路径（json 格式，文件初始不存在也没问题）
 
 ```ts
-import sync from 'ver-sync';
+import sync from '@semver-sync/sync';
 
 sync({
   cwd: process.cwd(),
@@ -65,7 +65,7 @@ sync({
 
 假定中途待同步目录内的文件有更新，再次执行，会提示如下图：
 
-![image02.png](https://static.kephp.com/assets/ver-sync/image02.png)
+![image02.png](https://static.kephp.com/assets/semver-sync/image02.png)
 
 可见基于和已存在的 `logFile` 内容进行比较，他自动生成下一个版本的文件名。
 
@@ -78,7 +78,7 @@ sync({
 并没有实际保存，只是模拟延时保存操作。
 
 ```ts
-import sync, { syncFiles } from 'ver-sync';
+import sync, { syncFiles } from '@semver-sync/sync';
 
 function getRandomInt(min: number, max: number) {
   const minCeiled = Math.ceil(min);

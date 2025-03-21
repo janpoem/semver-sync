@@ -1,17 +1,17 @@
 import { errMsg, notEmptyStr } from '@zenstone/ts-utils';
 import color from 'ansi-colors';
 import qiniu from 'qiniu';
-import { syncFiles } from 'ver-sync';
+import { syncFiles } from '@semver-sync/sync';
 import type {
   StoreHomedirKeyOptions,
   StoreQiniuConfig,
   StoreQiniuOptions,
-} from 'ver-sync';
+} from '@semver-sync/sync';
 import {
   convertUploadPath,
   isHomedirKeyOptions,
   readHomedirKey,
-} from 'ver-sync';
+} from '@semver-sync/sync';
 
 const defaultConfig = (): StoreQiniuConfig => ({
   ak: '',
