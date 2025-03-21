@@ -32,10 +32,8 @@ npm install @semver-sync/sync @semver-sync/store-qiniu
 
 ## 说明文档
 
-- [@semver-sync/sync](https://github.com/janpoem/ver-sync/blob/main/packages/ver-sync/README.md)
+- [@semver-sync/sync](https://github.com/janpoem/semver-sync/tree/main/packages/sync)
 
 ### stores
 
-- [@semver-sync/store-qiniu](https://github.com/janpoem/ver-sync/blob/main/packages/store-qiniu/README.md)
-
-
+- [@semver-sync/store-qiniu](https://github.com/janpoem/semver-sync/tree/main/packages/store-qiniu)
