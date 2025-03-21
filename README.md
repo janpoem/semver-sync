@@ -8,7 +8,7 @@ incrementing version numbers.
 
 基于本地日志实现文件同步的自管理，并实现版本号自增。
 
-![image01.png](https://static.kephp.com/assets/ver-sync/image01.png)
+![image01.png](https://static.kephp.com/assets/semver-sync/image01.png)
 
 ```bash
 npm install @semver-sync/sync
