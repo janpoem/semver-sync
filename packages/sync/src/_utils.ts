@@ -18,7 +18,7 @@ import type {
   SyncFile,
   SyncFiles,
   SyncRecord,
-  SyncStoreCallback,
+  SyncStoreImpl,
   SyncStoreOptions,
 } from './_types';
 
@@ -382,15 +382,13 @@ export const extractChangedRecord = async (
 // }
 
 /**
- * 类型推断：判断一个 {@link SyncStoreOptions} 是否为一个 {@link SyncStoreCallback}
+ * 类型推断：判断是否为一个有效的 {@link SyncStoreImpl}
  *
  * 以前老版本，提供直接的配置的方式，现在已经去掉，但这里预留扩展
  *
  * @param opts
  */
-export const isSyncStoreCallback = (
-  opts: SyncStoreOptions,
-): opts is SyncStoreCallback => {
+export const isSyncStoreImpl = (opts: unknown): opts is SyncStoreImpl => {
   return opts != null && typeof opts === 'function';
 };
 
@@ -406,7 +404,7 @@ export async function syncStore(
   changed: ChangedRecord,
   opts: SyncStoreOptions,
 ): Promise<SyncFiles> {
-  if (isSyncStoreCallback(opts)) {
+  if (isSyncStoreImpl(opts)) {
     return opts(changed);
   }
   // const { type, ...rest } = opts;

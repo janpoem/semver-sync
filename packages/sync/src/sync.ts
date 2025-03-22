@@ -22,7 +22,7 @@ export async function sync({
   onFiles,
   orderFiles,
   onChangeFiles,
-  store,
+  store: storeImpl,
   onSync,
   onLog,
   confirm,
@@ -52,7 +52,7 @@ export async function sync({
 
   const doSync = async () => {
     const now = Math.floor(Date.now() / 1000);
-    const syncFiles = await syncStore(changedFiles, store);
+    const syncFiles = await syncStore(changedFiles, storeImpl);
     if (Object.keys(syncFiles).length > 0) {
       log.files = { ...log.files, ...syncFiles };
       log.lastSync = now;

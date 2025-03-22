@@ -1,7 +1,15 @@
 import { errMsg } from '@zenstone/ts-utils/error';
 import color from 'ansi-colors';
-import type { ChangedRecord, ChangeFile, SyncFile, SyncFiles } from './_types';
+import type {
+  ChangedRecord,
+  ChangeFile,
+  SyncFile,
+  SyncFiles,
+  SyncStoreImpl,
+} from './_types';
 import { reduceMicrosecond } from './_utils';
+
+export type SyncFilesCurrying = (handle: SyncHandleCallback) => SyncStoreImpl;
 
 export type SyncHandleCallback = (
   file: ChangeFile,
@@ -9,7 +17,7 @@ export type SyncHandleCallback = (
 
 const output = console.log;
 
-export function syncFiles(handle: SyncHandleCallback) {
+export const syncFiles: SyncFilesCurrying = (handle: SyncHandleCallback) => {
   return async (files: ChangedRecord): Promise<SyncFiles> => {
     const keysMaxLength = Object.keys(files).reduce(
       (it, key) => (key.length > it ? key.length : it),
@@ -56,4 +64,4 @@ export function syncFiles(handle: SyncHandleCallback) {
 
     return records;
   };
-}
+};

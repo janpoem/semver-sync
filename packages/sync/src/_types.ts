@@ -31,7 +31,7 @@ export type SyncOptions = {
   onFiles?: (files: ListFilesRecord) => MaybePromise<void>;
   orderFiles?: OrderFilesFn;
   onChangeFiles?: (files: ChangedRecord) => MaybePromise<void>;
-  store: SyncStoreOptions;
+  store: SyncStoreImpl;
   onLog?: (params: OnLogParams) => MaybePromise<void>;
   onSync?: (params: OnSyncParams) => MaybePromise<void>;
   confirm?: boolean;
@@ -54,6 +54,8 @@ export type ExtractChangedOptions = {
 
 export type StoreHomedirKeyOptions = { key: string };
 
+export type StoreConfigProvider<Config> = () => Config;
+
 // export type StoreQiniuConfig = {
 //   ak: string;
 //   sk: string;
@@ -63,6 +65,10 @@ export type StoreHomedirKeyOptions = { key: string };
 
 // export type StoreQiniuOptions = StoreCallbackOptions &
 //   (StoreHomedirKeyOptions | StoreQiniuConfig);
+
+export type SyncStoreImpl = (
+  changed: ChangedRecord,
+) => SyncFiles | Promise<SyncFiles>;
 
 export type SyncStoreCallback = (
   changed: ChangedRecord,
