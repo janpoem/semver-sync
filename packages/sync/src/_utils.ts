@@ -10,9 +10,9 @@ import type {
   ChangedRecord,
   ChangeFile,
   ExtractChangedOptions,
+  ListFile,
   ListFilesGlobOptions,
   ListFilesRecord,
-  ListFilesRecordItem,
   OrderFilesFn,
   StoreHomedirKeyOptions,
   SyncFile,
@@ -30,7 +30,7 @@ import type {
  * @param path
  * @param canSymbolicLink
  */
-export function isFile(path: string, canSymbolicLink?: boolean): boolean {
+export const isFile = (path: string, canSymbolicLink?: boolean): boolean => {
   try {
     const stats = lstatSync(path);
     const isFile = stats.isFile();
@@ -41,7 +41,7 @@ export function isFile(path: string, canSymbolicLink?: boolean): boolean {
   } catch (_err) {
     return false;
   }
-}
+};
 
 /**
  * 判断给定路径是否为一个目录
@@ -49,7 +49,7 @@ export function isFile(path: string, canSymbolicLink?: boolean): boolean {
  * @param path
  * @param canSymbolicLink
  */
-export function isDir(path: string, canSymbolicLink?: boolean): boolean {
+export const isDir = (path: string, canSymbolicLink?: boolean): boolean => {
   try {
     const stats = lstatSync(path);
     const isDir = stats.isDirectory();
@@ -60,7 +60,7 @@ export function isDir(path: string, canSymbolicLink?: boolean): boolean {
   } catch (_err) {
     return false;
   }
-}
+};
 
 /**
  * 读取指定路径的 json 数据
@@ -69,7 +69,7 @@ export function isDir(path: string, canSymbolicLink?: boolean): boolean {
  *
  * @param path
  */
-export function loadJson<T>(path: string): T | undefined {
+export const loadJson = <T>(path: string): T | undefined => {
   try {
     if (isFile(path)) {
       return JSON.parse(readFileSync(path, { encoding: 'utf-8' }).toString());
@@ -77,18 +77,7 @@ export function loadJson<T>(path: string): T | undefined {
   } catch (_err) {
     return undefined;
   }
-}
-
-export function getDefaultSyncLog(): SyncRecord {
-  return {
-    files: {},
-    lastSync: 0,
-  };
-}
-
-export function loadSyncLog(path: string): SyncRecord {
-  return loadJsonObj(path, getDefaultSyncLog()) || getDefaultSyncLog();
-}
+};
 
 /**
  * 以一个 obj 结构方式加载 json
@@ -96,16 +85,30 @@ export function loadSyncLog(path: string): SyncRecord {
  * @param path
  * @param dft
  */
-export function loadJsonObj<T extends object>(
+export const loadJsonObj = <T extends object>(
   path: string,
   dft?: T,
-): T | undefined {
+): T | undefined => {
   const res = loadJson<T>(path);
   if (res != null && typeof res === 'object' && !Array.isArray(res)) {
     return { ...dft, ...res };
   }
   return dft;
-}
+};
+
+/**
+ * 返回一个默认的 {@link SyncRecord} 结构
+ */
+export const getDefaultSyncLog = (): SyncRecord => {
+  return {
+    files: {},
+    lastSync: 0,
+  };
+};
+
+export const loadSyncLog = (path: string): SyncRecord => {
+  return loadJsonObj(path, getDefaultSyncLog()) || getDefaultSyncLog();
+};
 
 export type ListFilePattern = [
   // 入口目录
@@ -125,10 +128,10 @@ export type ListFilePattern = [
  * @param entry
  * @param ext
  */
-export function buildPatterns(
+export const buildPatterns = (
   entry: string | string[],
   ext?: string,
-): ListFilePattern[] {
+): ListFilePattern[] => {
   return (Array.isArray(entry) ? entry : [entry])
     .map<ListFilePattern>((it) => {
       return [
@@ -138,7 +141,7 @@ export function buildPatterns(
       ];
     })
     .filter(Boolean);
-}
+};
 
 // export type ListFileItem = {
 //   path: string;
@@ -157,14 +160,14 @@ export function buildPatterns(
  * @param opts
  * @param orderFiles
  */
-export async function listFiles(
+export const listFiles = async (
   entry: string | string[],
   ext: string,
   cwd: string,
   opts?: ListFilesGlobOptions,
   orderFiles?: OrderFilesFn,
-): Promise<ListFilesRecord> {
-  const items: ListFilesRecordItem[] = [];
+): Promise<ListFilesRecord> => {
+  const items: ListFile[] = [];
   const patterns = buildPatterns(entry, ext);
   for (const patternIt of patterns) {
     const [base, pattern] = patternIt;
@@ -198,9 +201,13 @@ export async function listFiles(
   const orderFn: OrderFilesFn =
     orderFiles ??
     ((a, b) => {
+      // 0. => 目录深度正序
       if (a.depth === b.depth) {
+        // 1. => 目录前缀正序
         if (a.prefix === b.prefix) {
+          // 2. => 最后修改时间反序
           if (a.mtimeSec === b.mtimeSec) {
+            // 3. => 相对路径正序
             return a.relativePath.localeCompare(b.relativePath);
           }
           return b.mtimeSec - a.mtimeSec;
@@ -214,121 +221,125 @@ export async function listFiles(
     map[it.relativePath] = it;
     return map;
   }, {} as ListFilesRecord);
-  /**
-  for (let i = 0; i < patterns.length; i++) {
-    const [base, pattern] = patterns[i];
-    const files = await glob(pattern, {
-      nodir: true,
-      ...opts,
-      stat: true,
-      withFileTypes: true,
-      cwd,
-    });
-    const root = resolve(cwd, base);
-    files.forEach((it) => {
-      const path = it.fullpath();
-      const relativePath = convertHttpPath(relative(root, path));
-      const mtime = it.mtime ?? it.ctime ?? undefined;
-      const prefix = relativePath.includes('/')
-        ? relativePath.split('/')[0]
-        : '';
-      if (record[relativePath] == null) {
-        record[relativePath] = {
-          path,
-          prefix,
-          size: it.size ?? 0,
-          depth: it.depth(),
-          mtime,
-          mtimeSec: Math.floor(it.mtimeMs ?? 0 / 1000),
-        };
-      }
-    });
-  }
-  return Object.keys(records)
-    .sort((a, b) => {
-      if (records[a].prefix === records[b].prefix) {
-        if (records[a].depth === records[b].depth) {
-          if (records[a].mtimeSec === records[b].mtimeSec) {
-            return a < b ? -1 : a > b ? 1 : 0;
-          }
-          return records[b].mtimeSec - records[a].mtimeSec;
-        }
-        return records[b].depth - records[a].depth;
-      }
-      return records[a].prefix > records[b].prefix ? -1 : 1;
-    })
-    .reduce((map, key) => {
-      map[key] = records[key];
-      return map;
-    }, {} as ListFilesRecord);
-   */
-}
+};
 
-export function convertHttpPath(path: string): string {
-  return path.replace(/\\+/gm, '/');
-}
+/**
+ * 类型推断：是否为一个有效的 {@link SyncFile} 结构
+ *
+ * @param file
+ */
+export const isSyncFile = (file: unknown) =>
+  isInferObj<SyncFile>(
+    file,
+    (it) =>
+      notEmptyStr(it.ver) &&
+      !!valid(it.ver) &&
+      notEmptyStr(it.hash) &&
+      notEmptyStr(it.url),
+  );
 
-export function hashFile(path: string): string {
-  return createHash('md5').update(readFileSync(path)).digest('hex');
-}
+// export function isValidSyncFile(value: unknown): value is SyncFile {
+//   if (isAnyRecord(value)) {
+//     return !!(
+//       notEmptyString(value.ver) &&
+//       valid(value.ver) &&
+//       notEmptyString(value.hash) &&
+//       notEmptyString(value.url)
+//     );
+//   }
+//   return false;
+// }
 
-function isAnyRecord(value: unknown): value is Record<string, unknown> {
-  return value != null && typeof value === 'object';
-}
+/**
+ * 类型推断：是否为一个有效的 {@link ChangeFile} 结构
+ *
+ * @param file
+ */
+export const isChangeFile = (file: unknown) =>
+  isInferObj<ChangeFile>(
+    file,
+    (it) =>
+      notEmptyStr(it.key) &&
+      notEmptyStr(it.path) &&
+      notEmptyStr(it.relativePath) &&
+      notEmptyStr(it.hash) &&
+      notEmptyStr(it.ver) &&
+      notEmptyStr(it.verPath),
+  );
 
-function isString(value: unknown): value is string {
-  return value != null && typeof value === 'string';
-}
-
-function notEmptyString(value: unknown): value is string {
-  return isString(value) && value.trim() !== '';
-}
-
-export function isValidSyncFile(value: unknown): value is SyncFile {
-  if (isAnyRecord(value)) {
-    return !!(
-      notEmptyString(value.ver) &&
-      valid(value.ver) &&
-      notEmptyString(value.hash) &&
-      notEmptyString(value.url)
-    );
-  }
-  return false;
-}
-
-export function isValidChangeFile(it: unknown): it is ChangeFile {
-  if (isAnyRecord(it)) {
-    if (
-      notEmptyString(it.key) &&
-      notEmptyString(it.path) &&
-      notEmptyString(it.hash) &&
-      notEmptyString(it.ver) &&
-      notEmptyString(it.verPath)
-    ) {
-      if (!isFile(it.path)) {
-        console.warn(`file ${it.key} path '${it.path}' not exists!`);
-      }
-      return true;
+/**
+ * 判断是否为一个有效的 {@link ChangeFile} 结构，并额外检查该文件是否存在
+ *
+ * 如果文件不存在，不会返回 false，支持额外打印一个 warn 信息
+ *
+ * @param file
+ */
+export const verifyChangeFile = (file: unknown): file is ChangeFile => {
+  if (isChangeFile(file)) {
+    if (!isFile(file.path)) {
+      console.warn(`file ${file.key} path '${file.path}' not exists!`);
     }
+    return true;
   }
   return false;
-}
+};
 
-export function extractChangedRecord(
+// export function isValidChangeFile(it: unknown): it is ChangeFile {
+//   if (isAnyRecord(it)) {
+//     if (
+//       notEmptyString(it.key) &&
+//       notEmptyString(it.path) &&
+//       notEmptyString(it.hash) &&
+//       notEmptyString(it.ver) &&
+//       notEmptyString(it.verPath)
+//     ) {
+//       if (!isFile(it.path)) {
+//         console.warn(`file ${it.key} path '${it.path}' not exists!`);
+//       }
+//       return true;
+//     }
+//   }
+//   return false;
+// }
+
+/**
+ * hash 文件的方法
+ *
+ * @param path
+ * @param _item
+ */
+export const hashFile = (path: string, _item: ListFile): string => {
+  return createHash('md5').update(readFileSync(path)).digest('hex');
+};
+
+/**
+ * 提取变动的文件记录
+ *
+ * @param files
+ * @param syncLog
+ * @param withVer
+ * @param itemCallback
+ * @param userHashFile
+ */
+export const extractChangedRecord = async (
   files: ListFilesRecord,
   syncLog: SyncRecord,
-  { withVer, item: itemCallback }: ExtractChangedOptions = {},
-): ChangedRecord {
+  {
+    withVer,
+    item: itemCallback,
+    hash: userHashFile,
+  }: ExtractChangedOptions = {},
+): Promise<ChangedRecord> => {
   withVer = withVer ?? true;
   const changed: ChangedRecord = {};
   for (const [key, item] of Object.entries(files)) {
-    const ref = isValidSyncFile(syncLog.files[key])
+    const ref = isSyncFile(syncLog.files[key])
       ? syncLog.files[key]
       : { ver: '1.0.0', hash: '' };
     const ver = new SemVer(ref.ver);
     const { path, size, mtime, relativePath } = item;
 
-    const hash = hashFile(path);
+    const hash = await (userHashFile ?? hashFile)(path, item);
     if (hash !== ref.hash) {
       if (ref.hash !== '') {
         ver.inc('patch');
@@ -352,7 +363,7 @@ export function extractChangedRecord(
       };
       if (typeof itemCallback === 'function') {
         const ret = itemCallback(newItem);
-        if (isValidChangeFile(ret)) {
+        if (verifyChangeFile(ret)) {
           changed[key] = ret;
         }
       } else {
@@ -361,7 +372,7 @@ export function extractChangedRecord(
     }
   }
   return changed;
-}
+};
 
 // function isQiniuStore(
 //   type: unknown,
@@ -370,12 +381,27 @@ export function extractChangedRecord(
 //   return type === 'qiniu';
 // }
 
-function isSyncStoreCallback(
+/**
+ * 类型推断：判断一个 {@link SyncStoreOptions} 是否为一个 {@link SyncStoreCallback}
+ *
+ * 以前老版本，提供直接的配置的方式，现在已经去掉，但这里预留扩展
+ *
+ * @param opts
+ */
+export const isSyncStoreCallback = (
   opts: SyncStoreOptions,
-): opts is SyncStoreCallback {
+): opts is SyncStoreCallback => {
   return opts != null && typeof opts === 'function';
-}
+};
 
+/**
+ * 同步文件到对应的存储容器的 API 封装入口
+ *
+ * 该方法只是一个统一入口，而不关心具体实现
+ *
+ * @param changed
+ * @param opts
+ */
 export async function syncStore(
   changed: ChangedRecord,
   opts: SyncStoreOptions,
@@ -390,14 +416,26 @@ export async function syncStore(
   throw new Error('Synchronous storage type not supported');
 }
 
+/**
+ * 类型推断：判定 opts 是否有效的 {@link StoreHomedirKeyOptions} （只要包含一个非空字符串的 `key`）
+ *
+ * @param opts
+ */
 export const isHomedirKeyOptions = (opts: unknown) =>
   isInferObj<StoreHomedirKeyOptions>(opts, (it) => notEmptyStr(it.key));
 
-export function readHomedirKey<T extends object>(
+/**
+ * 基于路径，读取用户 Homedir 下的文件内容。
+ *
+ * @param type
+ * @param path
+ * @param dft
+ */
+export const readHomedirKey = <T extends object>(
   type: string,
   path: string,
   dft: T,
-): T | undefined {
+): T | undefined => {
   const file = `sync-${type}-${path}.json`;
   const fullPath = resolve(homedir(), file);
   if (!isFile(fullPath)) {
@@ -407,7 +445,7 @@ export function readHomedirKey<T extends object>(
     );
   }
   return loadJsonObj<T>(fullPath, dft);
-}
+};
 
 /**
  * 净化路径
@@ -417,14 +455,23 @@ export function readHomedirKey<T extends object>(
  *
  * @param path
  */
-export function purgeHttpPath(path?: string | null): string {
+export const purgeHttpPath = (path?: string | null): string => {
   if (path == null || path === '' || path === '/') {
     return '';
   }
   const p = path.replace(/(^\/+|\/+$)/gm, '');
   if (p === '/') return '';
   return p;
-}
+};
+
+/**
+ * 转换 http 路径
+ *
+ * @param path
+ */
+export const convertHttpPath = (path: string): string => {
+  return path.replace(/\\+/gm, '/');
+};
 
 /**
  * 转化上传路径，如果 path, basePath 传入为空字符、null、undefined 则会过滤掉
@@ -433,15 +480,15 @@ export function purgeHttpPath(path?: string | null): string {
  * @param path
  * @param basePath
  */
-export function convertUploadPath(
+export const convertUploadPath = (
   file: string,
   path?: string | null,
   basePath?: string | null,
-): string {
+): string => {
   return [purgeHttpPath(basePath), purgeHttpPath(path), file]
     .filter(Boolean)
     .join('/');
-}
+};
 
 // export const waiting = (s: number, callback?: () => void): Promise<void> =>
 //   new Promise((res) =>
@@ -457,32 +504,30 @@ export function convertUploadPath(
  * @param v
  * @param length
  */
-export function fillZero(v: number, length = 2): string {
+export const fillZero = (v: number, length = 2): string => {
   return (v < 10 ? '0'.repeat(length - 1) : '') + v;
-}
+};
 
 /**
  * 简单化日期事件格式化
  *
  * @param d
  */
-export function dateFormat(d: Date | undefined | null): string {
+export const dateFormat = (d: Date | undefined | null): string => {
   if (d == null) {
     return ' '.repeat(19);
   }
   return `${d.getFullYear()}-${fillZero(d.getMonth() + 1)}-${fillZero(
     d.getDate(),
   )} ${d.toLocaleTimeString()}`;
-}
+};
 
-export function extractErrorMessage(err: unknown): string {
-  if (err == null) return '';
-  if (typeof err === 'string') return err;
-  if (err instanceof Error) return err.message;
-  return '';
-}
-
-export function reduceMicrosecond(iValue: number): string {
+/**
+ * （基于比较时间差）降解 Microsecond 单位
+ *
+ * @param iValue
+ */
+export const reduceMicrosecond = (iValue: number): string => {
   let value = iValue;
   if (value < 1000) return `${value}ms`;
   value = value / 1000;
@@ -493,4 +538,4 @@ export function reduceMicrosecond(iValue: number): string {
   if (value < 60) return `${value.toFixed(2)}hours`;
   value = value / 24;
   return `${value.toFixed(2)}days`;
-}
+};

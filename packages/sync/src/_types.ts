@@ -16,10 +16,12 @@ export type OnLogParams = {
   log: SyncRecord;
 };
 
-export type OrderFilesFn = (
-  a: ListFilesRecordItem,
-  b: ListFilesRecordItem,
-) => number;
+export type OrderFilesFn = (a: ListFile, b: ListFile) => number;
+
+export type UserHashFileFn = (
+  path: string,
+  item: ListFile,
+) => MaybePromise<string>;
 
 export type SyncOptions = {
   entry: string | string[];
@@ -41,6 +43,7 @@ export type SyncOptions = {
 export type ExtractChangedOptions = {
   withVer?: boolean;
   item?: (item: ChangeFile) => ChangeFile | undefined | null;
+  hash?: UserHashFileFn;
 };
 
 // export type StoreCallbackOptions = {
@@ -85,7 +88,7 @@ export type SyncRecord = {
   lastSync: number;
 };
 
-export type ListFilesRecordItem = {
+export type ListFile = {
   path: string;
   relativePath: string;
   prefix: string;
@@ -98,7 +101,7 @@ export type ListFilesRecordItem = {
 // 列出所有的文件记录：
 // key 为http格式的相对路径
 // value 为源文件的完整路径
-export type ListFilesRecord = Record<string, ListFilesRecordItem>;
+export type ListFilesRecord = Record<string, ListFile>;
 
 export type ListFilesGlobOptions = Omit<GlobOptionsWithFileTypesTrue, 'stat'>;
 

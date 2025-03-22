@@ -1,6 +1,7 @@
+import { errMsg } from '@zenstone/ts-utils/error';
 import color from 'ansi-colors';
 import type { ChangedRecord, ChangeFile, SyncFile, SyncFiles } from './_types';
-import { extractErrorMessage, reduceMicrosecond } from './_utils';
+import { reduceMicrosecond } from './_utils';
 
 export type SyncHandleCallback = (
   file: ChangeFile,
@@ -21,13 +22,13 @@ export function syncFiles(handle: SyncHandleCallback) {
       const startMs = Date.now();
 
       let res: SyncFile | undefined;
-      let errMsg = '';
+      let msg = '';
 
       try {
         res = await handle(file);
         records[key] = res;
       } catch (err) {
-        errMsg = extractErrorMessage(err) || 'Unknown error';
+        msg = errMsg(err) || 'Unknown error';
       }
 
       const elapsedMs = Date.now() - startMs;
@@ -46,7 +47,7 @@ export function syncFiles(handle: SyncHandleCallback) {
                 color.greenBright(', '),
                 color.yellow(res.url),
               ]
-            : [color.bgRed('[err]'), color.gray(', '), color.grey(errMsg)]),
+            : [color.bgRed('[err]'), color.gray(', '), color.grey(msg)]),
           color.gray(', '),
           color.magenta(time),
         ].join(''),

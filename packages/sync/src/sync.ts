@@ -40,7 +40,7 @@ export async function sync({
 
   await onFiles?.(files);
 
-  const changedFiles = extractChangedRecord(files, log, changedOpts);
+  const changedFiles = await extractChangedRecord(files, log, changedOpts);
   const changedKeys = Object.keys(changedFiles);
   const changedCount = changedKeys.length;
   if (changedCount <= 0) {
