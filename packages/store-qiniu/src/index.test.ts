@@ -7,5 +7,5 @@ sync({
   confirm: true,
   logFile: 'logs/sync.test.json',
   saveLog: true,
-  store: storeQiniu({ key: 'only-test' }),
+  store: storeQiniu({ key: 'only-test', regionId: 'z2' }),
 }).catch(console.error);
