@@ -31,7 +31,7 @@ export type SyncOptions = {
   onFiles?: (files: ListFilesRecord) => MaybePromise<void>;
   orderFiles?: OrderFilesFn;
   onChangeFiles?: (files: ChangedRecord) => MaybePromise<void>;
-  store: SyncStoreImpl;
+  store: SyncStoreOptions;
   onLog?: (params: OnLogParams) => MaybePromise<void>;
   onSync?: (params: OnSyncParams) => MaybePromise<void>;
   confirm?: boolean;
@@ -42,7 +42,7 @@ export type SyncOptions = {
 
 export type ExtractChangedOptions = {
   withVer?: boolean;
-  item?: (item: ChangeFile) => ChangeFile | undefined | null;
+  item?: (item: ChangedFile) => ChangedFile | undefined | null;
   hash?: UserHashFileFn;
 };
 
@@ -70,11 +70,7 @@ export type SyncStoreImpl = (
   changed: ChangedRecord,
 ) => SyncFiles | Promise<SyncFiles>;
 
-export type SyncStoreCallback = (
-  changed: ChangedRecord,
-) => SyncFiles | Promise<SyncFiles>;
-
-export type SyncStoreOptions = SyncStoreCallback;
+export type SyncStoreOptions = SyncStoreImpl;
 
 export type SyncFile = {
   // 更新版本号
@@ -111,7 +107,7 @@ export type ListFilesRecord = Record<string, ListFile>;
 
 export type ListFilesGlobOptions = Omit<GlobOptionsWithFileTypesTrue, 'stat'>;
 
-export type ChangeFile = {
+export type ChangedFile = {
   // 源文件相对路径名
   key: string;
   basename: string;
@@ -128,4 +124,4 @@ export type ChangeFile = {
   type: string;
 };
 
-export type ChangedRecord = Record<string, ChangeFile>;
+export type ChangedRecord = Record<string, ChangedFile>;

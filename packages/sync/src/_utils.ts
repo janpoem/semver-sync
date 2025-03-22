@@ -7,8 +7,8 @@ import { homedir } from 'node:os';
 import { extname, relative, resolve } from 'node:path';
 import { SemVer, valid } from 'semver';
 import type {
+  ChangedFile,
   ChangedRecord,
-  ChangeFile,
   ExtractChangedOptions,
   ListFile,
   ListFilesGlobOptions,
@@ -251,12 +251,12 @@ export const isSyncFile = (file: unknown) =>
 // }
 
 /**
- * 类型推断：是否为一个有效的 {@link ChangeFile} 结构
+ * 类型推断：是否为一个有效的 {@link ChangedFile} 结构
  *
  * @param file
  */
 export const isChangeFile = (file: unknown) =>
-  isInferObj<ChangeFile>(
+  isInferObj<ChangedFile>(
     file,
     (it) =>
       notEmptyStr(it.key) &&
@@ -268,13 +268,13 @@ export const isChangeFile = (file: unknown) =>
   );
 
 /**
- * 判断是否为一个有效的 {@link ChangeFile} 结构，并额外检查该文件是否存在
+ * 判断是否为一个有效的 {@link ChangedFile} 结构，并额外检查该文件是否存在
  *
  * 如果文件不存在，不会返回 false，支持额外打印一个 warn 信息
  *
  * @param file
  */
-export const verifyChangeFile = (file: unknown): file is ChangeFile => {
+export const verifyChangeFile = (file: unknown): file is ChangedFile => {
   if (isChangeFile(file)) {
     if (!isFile(file.path)) {
       console.warn(`file ${file.key} path '${file.path}' not exists!`);
@@ -348,7 +348,7 @@ export const extractChangedRecord = async (
       const fileBasename = key.replace(new RegExp(`${fileExt}$`), '');
       const verPath =
         fileBasename + (withVer ? `-${ver.version}` : '') + fileExt;
-      const newItem: ChangeFile = {
+      const newItem: ChangedFile = {
         key,
         basename: fileBasename,
         path,

@@ -1,8 +1,8 @@
 import { errMsg } from '@zenstone/ts-utils/error';
 import color from 'ansi-colors';
 import type {
+  ChangedFile,
   ChangedRecord,
-  ChangeFile,
   SyncFile,
   SyncFiles,
   SyncStoreImpl,
@@ -12,7 +12,7 @@ import { reduceMicrosecond } from './_utils';
 export type SyncFilesCurrying = (handle: SyncHandleCallback) => SyncStoreImpl;
 
 export type SyncHandleCallback = (
-  file: ChangeFile,
+  file: ChangedFile,
 ) => Promise<SyncFile> | SyncFile;
 
 const output = console.log;
