@@ -26,6 +26,9 @@
   "files": ["dist"],
   "exports": {
     ".": {
+      "bun": {
+        "default": "./src/index.ts"
+      },
       "import": {
         "default": "./dist/esm/index.mjs",
         "types": "./dist/esm/index.d.mts"

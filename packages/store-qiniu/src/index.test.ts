@@ -4,7 +4,7 @@ import storeQiniu from './index';
 
 sync({
   entry: resolve(process.cwd(), '../../test'),
-  confirm: true,
+  // confirm: true,
   logFile: 'logs/sync.test.json',
   saveLog: true,
   store: storeQiniu({ key: 'only-test', regionId: 'z2' }),

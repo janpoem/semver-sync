@@ -1,4 +1,10 @@
-import { convertUploadPath, type SyncFile, syncFiles } from '@semver-sync/sync';
+import {
+  type ChangedRecord,
+  convertUploadPath,
+  type SyncFile,
+  type SyncFiles,
+  syncFiles,
+} from '@semver-sync/sync';
 import { errMsg } from '@zenstone/ts-utils';
 import qiniu from 'qiniu';
 import { loadConfig } from './config';
@@ -53,39 +59,46 @@ export const uploadQiniu = (
   });
 };
 
-const storeQiniu = (opts: StoreQiniuInputOptions) => {
-  const { path, withVer = true } = opts;
-  const config = loadConfig(opts);
+const storeQiniu =
+  (opts: StoreQiniuInputOptions) =>
+  // 上一层，只是 currying store options
+  async (files: ChangedRecord): Promise<SyncFiles> => {
+    const { path, withVer = true } = opts;
+    const config = await loadConfig(opts);
 
-  if (!config.baseUrl) {
-    throw new Error('You must specify the baseUrl');
-  }
-  const { host, pathname: basePath } = new URL(config.baseUrl);
+    if (!config.baseUrl) {
+      throw new Error('You must specify the baseUrl');
+    }
 
-  return syncFiles((file) => {
-    return new Promise((resolve, reject) => {
-      const uploadPath = convertUploadPath(
-        withVer ? file.verPath : file.relativePath,
-        path,
-        basePath,
-      );
-      uploadQiniu(config, opts, file.path, uploadPath)
-        .then(async (respBody: QiniuResponse) => {
-          const syncFile: SyncFile = {
-            ver: file.ver,
-            hash: file.hash,
-            url: `//${host}/${respBody.key}`,
-            type: file.type,
-          };
-          await opts.onUpload?.({ file, syncFile, respBody });
-          resolve(syncFile);
-        })
-        .catch((err) => {
-          opts.onError?.(err);
-          reject(err);
-        });
-    });
-  });
-};
+    const baseUrl = new URL(config.baseUrl);
+    const { host, pathname: basePath } = baseUrl;
+
+    return syncFiles((file) => {
+      return new Promise((resolve, reject) => {
+        const uploadPath = convertUploadPath(
+          withVer ? file.verPath : file.relativePath,
+          path,
+          basePath,
+        );
+        uploadQiniu(config, opts, file.path, uploadPath)
+          .then(async (respBody: QiniuResponse) => {
+            const syncFile: SyncFile = {
+              ver: file.ver,
+              hash: file.hash,
+              url: `//${host}/${respBody.key}`,
+              type: file.type,
+            };
+            const params = { file, syncFile, respBody, baseUrl };
+            if (opts.makeUrl) syncFile.url = opts.makeUrl?.(params);
+            await opts.onUpload?.(params);
+            resolve(syncFile);
+          })
+          .catch((err) => {
+            opts.onError?.(err);
+            reject(err);
+          });
+      });
+    })(files);
+  };
 
 export default storeQiniu;

@@ -1,15 +1,9 @@
-import { isHomedirKeyOptions, readHomedirKey } from '@semver-sync/sync';
+import { isStoreKeyOptions, loadStoreKeyConfig } from '@semver-sync/sync';
 import { errMsg, notEmptyStr } from '@zenstone/ts-utils';
 import color from 'ansi-colors';
 import type { StoreQiniuConfig, StoreQiniuInputOptions } from './types';
 
-export const verifyConfig = (
-  key: string,
-  data?: StoreQiniuConfig,
-): StoreQiniuConfig => {
-  if (data == null) {
-    throw new Error(`Load qiniu store config ${color.yellow(key)} data null`);
-  }
+export const verifyConfig = (data: StoreQiniuConfig): StoreQiniuConfig => {
   const errors: string[] = [];
   for (const [key, value] of Object.entries(data)) {
     if (!notEmptyStr(value)) {
@@ -28,7 +22,7 @@ export const verifyConfig = (
   }
   if (errors.length) {
     console.log(
-      `There are ${color.redBright(`${errors.length} error(s)`)} in qiniu store config ${color.yellowBright(key)}`,
+      `There are ${color.redBright(`${errors.length} error(s)`)} in qiniu store config`,
     );
     for (const err of errors) {
       console.log(err);
@@ -45,12 +39,11 @@ const defaultConfig = (): StoreQiniuConfig => ({
   baseUrl: '',
 });
 
-export const loadConfig = (opts: StoreQiniuInputOptions): StoreQiniuConfig => {
-  if (isHomedirKeyOptions(opts)) {
-    return verifyConfig(
-      opts.key,
-      readHomedirKey('qiniu', opts.key, defaultConfig()),
-    );
+export const loadConfig = async (
+  opts: StoreQiniuInputOptions,
+): Promise<StoreQiniuConfig> => {
+  if (isStoreKeyOptions(opts)) {
+    return verifyConfig(loadStoreKeyConfig('qiniu', opts.key, defaultConfig()));
   }
   throw new Error('Invalid qiniu store options input');
 };
