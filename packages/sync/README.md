@@ -235,14 +235,14 @@ export type ExtractChangedOptions = {
 };
 type UserHashFileFn = (path: string, item: ListFile) => MaybePromise<string>;
 
-export type OnSyncParams = {
+type OnSyncParams = {
   files: ListFilesRecord;
   changedFiles: ChangedRecord;
   syncFiles: SyncFiles;
   log: SyncRecord;
 };
 
-export type OnLogParams = {
+type OnLogParams = {
   files: ListFilesRecord;
   changedFiles: ChangedRecord;
   syncFiles: SyncFiles;
@@ -253,7 +253,7 @@ export type OnLogParams = {
 type OrderFilesFn = (a: ListFile, b: ListFile) => number;
 
 // glob 额外参数
-export type ListFilesGlobOptions = Omit<GlobOptionsWithFileTypesTrue, 'stat'>;
+type ListFilesGlobOptions = Omit<GlobOptionsWithFileTypesTrue, 'stat'>;
 ```
 
 ### syncFiles 参数说明

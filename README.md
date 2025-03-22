@@ -10,6 +10,8 @@ incrementing version numbers.
 
 ![image01.png](https://static.kephp.com/assets/semver-sync/image01.png)
 
+![image02.png](https://static.kephp.com/assets/semver-sync/image02.png)
+
 ```bash
 npm install @semver-sync/sync
 # or
