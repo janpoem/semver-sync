@@ -2,7 +2,7 @@ import color from 'ansi-colors';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import * as readline from 'node:readline';
-import type { ChangedRecord, SyncOptions } from './_types';
+import type { ChangedRecord, SyncOptions, SyncResult } from './_types';
 import {
   dateFormat,
   extractChangedRecord,
@@ -29,26 +29,32 @@ export async function sync({
   cwd: iCwd,
   changed: changedOpts,
   glob: globOpts,
-}: SyncOptions): Promise<void> {
+}: SyncOptions): Promise<SyncResult> {
   const cwd = iCwd || process.cwd();
+
   logFile = logFile || 'sync.json';
   const logPath = isAbsolute(logFile) ? logFile : resolve(cwd, logFile);
-
   const log = loadSyncLog(logPath);
 
   const files = await listFiles(entry, ext || '', cwd, globOpts, orderFiles);
-
   await onFiles?.(files);
-
   const changedFiles = await extractChangedRecord(files, log, changedOpts);
+  await onChangeFiles?.(changedFiles);
+
   const changedKeys = Object.keys(changedFiles);
   const changedCount = changedKeys.length;
+
+  const result = {
+    files,
+    changedFiles,
+    log,
+    isConfirm: true,
+  };
+
   if (changedCount <= 0) {
     output('There are no files to sync yet!');
-    return;
+    return result;
   }
-
-  await onChangeFiles?.(changedFiles);
 
   const doSync = async () => {
     const now = Math.floor(Date.now() / 1000);
@@ -62,38 +68,43 @@ export async function sync({
       }
     }
     await onSync?.({ files, changedFiles, syncFiles, log });
-    process.exit();
   };
 
-  const doConfirm = (handle: (answer: string) => Promise<void> | void) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
+  const doConfirm = (
+    handle: (answer: string) => Promise<boolean> | boolean,
+  ) => {
+    return new Promise<boolean>((resolve, reject) => {
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+      });
+
+      rl.question(
+        'Are you sure want to sync the above files? [y|enter|n] ',
+        (answer) => {
+          const res = handle(answer);
+          res ? output(color.green('Yes')) : output(color.red('No'));
+          rl.close();
+          resolve(res);
+        },
+      );
     });
-
-    rl.question(
-      'Are you sure want to sync the above files? [y|enter|n] ',
-      handle,
-    );
   };
+
   output(
     `There are ${color.cyanBright(`${changedCount}`)} file(s) to be synced:`,
   );
-  if (confirm) {
-    listChangedFiles(changedFiles);
+  listChangedFiles(changedFiles);
 
-    doConfirm(async (answer) => {
-      if (answer.toLowerCase() === 'y' || answer === '') {
-        output(color.green('Yes'));
-        await doSync();
-      } else {
-        output(color.green('No'));
-        process.exit(0);
-      }
-    });
-  } else {
-    await doSync();
+  if (confirm) {
+    result.isConfirm = await doConfirm(
+      (input) => input.toLowerCase() === 'y' || input === '',
+    );
   }
+
+  if (result.isConfirm) await doSync();
+
+  return result;
 }
 
 export function listChangedFiles(changedFiles: ChangedRecord): void {
