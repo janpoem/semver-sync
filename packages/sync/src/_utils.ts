@@ -24,22 +24,51 @@ import type {
 
 // import { storeQiniu } from './storeQiniu';
 
-export function isFile(path: string): boolean {
+/**
+ * 判断给定路径是否为一个文件
+ *
+ * @param path
+ * @param canSymbolicLink
+ */
+export function isFile(path: string, canSymbolicLink?: boolean): boolean {
   try {
-    return lstatSync(path).isFile();
+    const stats = lstatSync(path);
+    const isFile = stats.isFile();
+    if (isFile && canSymbolicLink === false) {
+      return !stats.isSymbolicLink();
+    }
+    return isFile;
   } catch (_err) {
     return false;
   }
 }
 
-export function isDir(path: string): boolean {
+/**
+ * 判断给定路径是否为一个目录
+ *
+ * @param path
+ * @param canSymbolicLink
+ */
+export function isDir(path: string, canSymbolicLink?: boolean): boolean {
   try {
-    return lstatSync(path).isDirectory();
+    const stats = lstatSync(path);
+    const isDir = stats.isDirectory();
+    if (isDir && canSymbolicLink === false) {
+      return !stats.isSymbolicLink();
+    }
+    return isDir;
   } catch (_err) {
     return false;
   }
 }
 
+/**
+ * 读取指定路径的 json 数据
+ *
+ * 该方法不做任何判定，只要能正确 JSON.parse 即满足泛型 `T`。
+ *
+ * @param path
+ */
 export function loadJson<T>(path: string): T | undefined {
   try {
     if (isFile(path)) {
@@ -61,6 +90,12 @@ export function loadSyncLog(path: string): SyncRecord {
   return loadJsonObj(path, getDefaultSyncLog()) || getDefaultSyncLog();
 }
 
+/**
+ * 以一个 obj 结构方式加载 json
+ *
+ * @param path
+ * @param dft
+ */
 export function loadJsonObj<T extends object>(
   path: string,
   dft?: T,
@@ -79,6 +114,17 @@ export type ListFilePattern = [
   string,
 ];
 
+/**
+ * 构建基于入口和后缀名，生成对应的文件查询表达式
+ *
+ * - 支持多入口
+ * - 多个 ext 的名，采用 glob 输入格式，如：{png,jpeg}，如果不指定，默认为 *
+ *
+ * @see https://github.com/isaacs/node-glob?tab=readme-ov-file#glob-primer
+ * @see https://www.npmjs.com/package/glob
+ * @param entry
+ * @param ext
+ */
 export function buildPatterns(
   entry: string | string[],
   ext?: string,
@@ -94,11 +140,23 @@ export function buildPatterns(
     .filter(Boolean);
 }
 
-export type ListFileItem = {
-  path: string;
-  relativePath: string;
-};
+// export type ListFileItem = {
+//   path: string;
+//   relativePath: string;
+// };
 
+/**
+ * 根据指定的 enter, ext ，列举出目录下符合条件的文件
+ *
+ * - 可以额外指定 {@link ListFilesGlobOptions} 额外查询选项
+ * - 亦可指定文件的排序算法 {@link OrderFilesFn}
+ *
+ * @param entry
+ * @param ext
+ * @param cwd
+ * @param opts
+ * @param orderFiles
+ */
 export async function listFiles(
   entry: string | string[],
   ext: string,
@@ -351,6 +409,14 @@ export function readHomedirKey<T extends object>(
   return loadJsonObj<T>(fullPath, dft);
 }
 
+/**
+ * 净化路径
+ *
+ * - null | undefined | '' | '/' => ''
+ * - 移除头尾的 `/`
+ *
+ * @param path
+ */
 export function purgeHttpPath(path?: string | null): string {
   if (path == null || path === '' || path === '/') {
     return '';
@@ -360,6 +426,13 @@ export function purgeHttpPath(path?: string | null): string {
   return p;
 }
 
+/**
+ * 转化上传路径，如果 path, basePath 传入为空字符、null、undefined 则会过滤掉
+ *
+ * @param file
+ * @param path
+ * @param basePath
+ */
 export function convertUploadPath(
   file: string,
   path?: string | null,
@@ -370,18 +443,29 @@ export function convertUploadPath(
     .join('/');
 }
 
-export const waiting = (s: number, callback?: () => void): Promise<void> =>
-  new Promise((res) =>
-    setTimeout(async () => {
-      callback?.();
-      res();
-    }, s * 1000),
-  );
+// export const waiting = (s: number, callback?: () => void): Promise<void> =>
+//   new Promise((res) =>
+//     setTimeout(async () => {
+//       callback?.();
+//       res();
+//     }, s * 1000),
+//   );
 
-export function fillZero(v: number): string {
-  return (v < 10 ? '0' : '') + v;
+/**
+ * 补前导 0
+ *
+ * @param v
+ * @param length
+ */
+export function fillZero(v: number, length = 2): string {
+  return (v < 10 ? '0'.repeat(length - 1) : '') + v;
 }
 
+/**
+ * 简单化日期事件格式化
+ *
+ * @param d
+ */
 export function dateFormat(d: Date | undefined | null): string {
   if (d == null) {
     return ' '.repeat(19);

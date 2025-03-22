@@ -43,23 +43,23 @@ export type ExtractChangedOptions = {
   item?: (item: ChangeFile) => ChangeFile | undefined | null;
 };
 
-export type StoreCallbackOptions = {
-  path?: string;
-  callback?: (record: SyncFiles) => void | Promise<void>;
-  withVer?: boolean;
-};
+// export type StoreCallbackOptions = {
+//   path?: string;
+//   callback?: (record: SyncFiles) => void | Promise<void>;
+//   withVer?: boolean;
+// };
 
 export type StoreHomedirKeyOptions = { key: string };
 
-export type StoreQiniuConfig = {
-  ak: string;
-  sk: string;
-  bucket: string;
-  baseUrl: string;
-};
+// export type StoreQiniuConfig = {
+//   ak: string;
+//   sk: string;
+//   bucket: string;
+//   baseUrl: string;
+// };
 
-export type StoreQiniuOptions = StoreCallbackOptions &
-  (StoreHomedirKeyOptions | StoreQiniuConfig);
+// export type StoreQiniuOptions = StoreCallbackOptions &
+//   (StoreHomedirKeyOptions | StoreQiniuConfig);
 
 export type SyncStoreCallback = (
   changed: ChangedRecord,
