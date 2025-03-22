@@ -14,8 +14,8 @@ import type {
   ListFilesGlobOptions,
   ListFilesRecord,
   OrderFilesFn,
-  StoreCustomConfigOptions,
-  StoreHomedirKeyOptions,
+  StoreKey,
+  StoreKeyOptions,
   SyncFile,
   SyncFiles,
   SyncRecord,
@@ -428,46 +428,46 @@ export async function syncStore(
 }
 
 /**
- * 类型推断：判定 opts 是否有效的 {@link StoreHomedirKeyOptions} （只要包含一个非空字符串的 `key`）
+ * 类型推断：判定 opts 是否有效的 {@link StoreKeyOptions} （只要包含一个非空字符串的 `key`）
  *
  * @param opts
  */
-export const isHomedirKeyOptions = (opts: unknown) =>
-  isInferObj<StoreHomedirKeyOptions>(opts, (it) => notEmptyStr(it.key));
-
-export const isStoreCustomConfigOptions = (opts: unknown) =>
-  isInferObj<StoreCustomConfigOptions<object>>(
+export const isStoreKeyOptions = (opts: unknown) =>
+  isInferObj<StoreKeyOptions>(
     opts,
-    (it) =>
-      it.config != null &&
-      (isInferObj(it.config) || typeof it.config === 'function'),
+    (it) => notEmptyStr(it.key) || typeof it.key === 'function',
   );
 
-export const pickStoreCustomConfig = async <Config>(
-  opts: StoreCustomConfigOptions<object>,
-) => {};
-
 /**
- * 基于路径，读取用户 Homedir 下的文件内容。
+ * 基于 key ，读取对应同步配置。
  *
  * @param type
- * @param path
+ * @param key
  * @param dft
  */
-export const readHomedirKey = <T extends object>(
+export const loadStoreKeyConfig = <Config extends object>(
   type: string,
-  path: string,
-  dft: T,
-): T | undefined => {
-  const file = `sync-${type}-${path}.json`;
-  const fullPath = resolve(homedir(), file);
+  key: StoreKey,
+  dft: Config,
+): Config => {
+  const fullPath =
+    typeof key === 'string'
+      ? resolve(homedir(), `sync-${type}-${key}.json`)
+      : key(type);
   if (!isFile(fullPath)) {
     throw new Error(
       `The sync configuration file '${fullPath}' does not exist. Please create it manually. ` +
-        `The content format is as follows: ${JSON.stringify(dft)}`,
+        `Please refer to the correct content: ${JSON.stringify(dft)}`,
     );
   }
-  return loadJsonObj<T>(fullPath, dft);
+  const data = loadJsonObj<Config>(fullPath, dft);
+  if (data == null) {
+    throw new Error(
+      `The sync configuration does '${fullPath}' not contain valid data.` +
+        `Please refer to the correct content: ${JSON.stringify(dft)}`,
+    );
+  }
+  return data;
 };
 
 /**

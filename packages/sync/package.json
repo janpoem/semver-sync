@@ -22,9 +22,12 @@
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "type": "module",
-  "files": ["dist"],
+  "files": ["dist", "src"],
   "exports": {
     ".": {
+      "bun": {
+        "default": "./src/index.ts"
+      },
       "import": {
         "default": "./dist/esm/index.js",
         "types": "./dist/esm/index.d.ts"

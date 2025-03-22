@@ -59,11 +59,14 @@ export type ExtractChangedOptions = {
 //   withVer?: boolean;
 // };
 
-export type StoreHomedirKeyOptions = { key: string };
+export type StoreKey = string | ((type: string) => string);
 
-export type StoreCustomConfigOptions<Config extends object> = {
-  config: Config | (() => MaybePromise<Config>);
-};
+export type StoreKeyOptions = { key: StoreKey };
+
+// 明确不提供这种方式，强烈要求不能基于显示的方式去声明任何私密的配置
+// export type StoreCustomConfigOptions<Config extends object> = {
+//   config: Config | (() => MaybePromise<Config>);
+// };
 
 // export type StoreQiniuConfig = {
 //   ak: string;
