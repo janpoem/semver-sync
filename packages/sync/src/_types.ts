@@ -40,6 +40,13 @@ export type SyncOptions = {
   glob?: ListFilesGlobOptions;
 };
 
+export type SyncResult = {
+  files: ListFilesRecord;
+  changedFiles: ChangedRecord;
+  log: SyncRecord;
+  isConfirm: boolean;
+};
+
 export type ExtractChangedOptions = {
   withVer?: boolean;
   item?: (item: ChangedFile) => ChangedFile | undefined | null;
@@ -54,7 +61,9 @@ export type ExtractChangedOptions = {
 
 export type StoreHomedirKeyOptions = { key: string };
 
-export type StoreConfigProvider<Config> = () => Config;
+export type StoreCustomConfigOptions<Config extends object> = {
+  config: Config | (() => MaybePromise<Config>);
+};
 
 // export type StoreQiniuConfig = {
 //   ak: string;
@@ -66,11 +75,11 @@ export type StoreConfigProvider<Config> = () => Config;
 // export type StoreQiniuOptions = StoreCallbackOptions &
 //   (StoreHomedirKeyOptions | StoreQiniuConfig);
 
-export type SyncStoreImpl = (
+export type SyncStoreCallbackImpl = (
   changed: ChangedRecord,
 ) => SyncFiles | Promise<SyncFiles>;
 
-export type SyncStoreOptions = SyncStoreImpl;
+export type SyncStoreOptions = SyncStoreCallbackImpl;
 
 export type SyncFile = {
   // 更新版本号

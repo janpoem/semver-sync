@@ -5,19 +5,16 @@ import type {
   ChangedRecord,
   SyncFile,
   SyncFiles,
-  SyncStoreImpl,
 } from './_types';
 import { reduceMicrosecond } from './_utils';
 
-export type SyncFilesCurrying = (handle: SyncHandleCallback) => SyncStoreImpl;
-
-export type SyncHandleCallback = (
+export type SyncHandleFileCallback = (
   file: ChangedFile,
 ) => Promise<SyncFile> | SyncFile;
 
 const output = console.log;
 
-export const syncFiles: SyncFilesCurrying = (handle: SyncHandleCallback) => {
+export const syncFiles = (handle: SyncHandleFileCallback) => {
   return async (files: ChangedRecord): Promise<SyncFiles> => {
     const keysMaxLength = Object.keys(files).reduce(
       (it, key) => (key.length > it ? key.length : it),

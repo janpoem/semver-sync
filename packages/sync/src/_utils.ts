@@ -14,11 +14,12 @@ import type {
   ListFilesGlobOptions,
   ListFilesRecord,
   OrderFilesFn,
+  StoreCustomConfigOptions,
   StoreHomedirKeyOptions,
   SyncFile,
   SyncFiles,
   SyncRecord,
-  SyncStoreImpl,
+  SyncStoreCallbackImpl,
   SyncStoreOptions,
 } from './_types';
 
@@ -382,13 +383,15 @@ export const extractChangedRecord = async (
 // }
 
 /**
- * 类型推断：判断是否为一个有效的 {@link SyncStoreImpl}
+ * 类型推断：判断是否为一个有效的 {@link SyncStoreCallbackOptions}
  *
  * 以前老版本，提供直接的配置的方式，现在已经去掉，但这里预留扩展
  *
  * @param opts
  */
-export const isSyncStoreImpl = (opts: unknown): opts is SyncStoreImpl => {
+export const isSyncStoreCallbackImpl = (
+  opts: unknown,
+): opts is SyncStoreCallbackImpl => {
   return opts != null && typeof opts === 'function';
 };
 
@@ -404,7 +407,17 @@ export async function syncStore(
   changed: ChangedRecord,
   opts: SyncStoreOptions,
 ): Promise<SyncFiles> {
-  if (isSyncStoreImpl(opts)) {
+  // if (opts instanceof Promise) {
+  //   return new Promise((resolve, reject) => {
+  //     opts
+  //       .then(async (impl) => {
+  //         resolve(await impl(changed));
+  //       })
+  //       .catch(reject);
+  //   });
+  // }
+
+  if (isSyncStoreCallbackImpl(opts)) {
     return opts(changed);
   }
   // const { type, ...rest } = opts;
@@ -421,6 +434,18 @@ export async function syncStore(
  */
 export const isHomedirKeyOptions = (opts: unknown) =>
   isInferObj<StoreHomedirKeyOptions>(opts, (it) => notEmptyStr(it.key));
+
+export const isStoreCustomConfigOptions = (opts: unknown) =>
+  isInferObj<StoreCustomConfigOptions<object>>(
+    opts,
+    (it) =>
+      it.config != null &&
+      (isInferObj(it.config) || typeof it.config === 'function'),
+  );
+
+export const pickStoreCustomConfig = async <Config>(
+  opts: StoreCustomConfigOptions<object>,
+) => {};
 
 /**
  * 基于路径，读取用户 Homedir 下的文件内容。
