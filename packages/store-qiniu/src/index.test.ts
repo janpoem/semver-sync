@@ -1,9 +1,9 @@
 import { sync } from '@semver-sync/sync';
+import { resolve } from 'node:path';
 import storeQiniu from './index';
 
 sync({
-  cwd: process.cwd(),
-  entry: 'test',
+  entry: resolve(process.cwd(), '../../test'),
   confirm: true,
   logFile: 'logs/sync.test.json',
   saveLog: true,

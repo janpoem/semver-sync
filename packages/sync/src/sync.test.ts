@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 import { sync } from './sync';
 import { syncFiles } from './sync-files';
 
@@ -8,8 +9,7 @@ function getRandomInt(min: number, max: number) {
 }
 
 sync({
-  cwd: process.cwd(),
-  entry: 'test',
+  entry: resolve(process.cwd(), '../../test'),
   confirm: true,
   logFile: 'logs/sync.test.json',
   saveLog: true,
