@@ -55,12 +55,13 @@ Windows 为例，则是 `C:\Users\username\sync-qiniu-my-repo.json`。
 
 json 配置文件格式如下：
 
-```json
+```json5
 {
   "ak": "qiniu-access-key",
   "sk": "qiniu-secret-key",
   "bucket": "bucket-name",
-  "baseUrl": "base-url"
+  "baseUrl": "base-url",
+  "regionId": "z0" // 选填
 }
 ```
 

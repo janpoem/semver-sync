@@ -36,7 +36,7 @@ sync({
 
 `logFile` 只记录最新版号，最新hash，文件后缀类型，对应版本号的相对路径 url，参考如下：
 
-```json
+```json5
 {
   "files": {
     "a.js": {
