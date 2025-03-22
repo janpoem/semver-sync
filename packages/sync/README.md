@@ -130,7 +130,14 @@ import type { GlobOptionsWithFileTypesTrue } from 'glob';
 
 type MaybePromise<T> = T | Promise<T>;
 
-declare function sync(opts: SyncOptions): Promise<void>;
+declare function sync(opts: SyncOptions): Promise<SyncResult>;
+
+type SyncResult = {
+  files: ListFilesRecord;
+  changedFiles: ChangedRecord;
+  log: SyncRecord;
+  isConfirm: boolean;
+};
 
 // sync 函数的参数
 type SyncOptions = {
@@ -164,8 +171,8 @@ type SyncOptions = {
 };
 
 // 列举一个目录下的全部文件记录，以 relativePath 为 key
-type ListFilesRecord = Record<string, ListFilesRecordItem>;
-type ListFilesRecordItem = {
+type ListFilesRecord = Record<string, ListFile>;
+type ListFile = {
   // 绝对路径
   path: string;
   // 相对路径
@@ -185,7 +192,7 @@ type ListFilesRecordItem = {
 // 已更改过的文件文件记录
 // 这时已经经过对日志版本进行比较
 type ChangedRecord = Record<string, ChangeFile>;
-type ChangeFile = {
+type ChangedFile = {
   key: string;
   basename: string;
   path: string;
@@ -213,20 +220,20 @@ type SyncFile = {
   type: string;
 };
 
-// 同步接口函数版，以前有 class / object 版，都移除
-export type SyncStoreCallback = (
-  changed: ChangedRecord,
-) => SyncFiles | Promise<SyncFiles>;
-// 同步接口
-export type SyncStoreOptions = SyncStoreCallback;
+// 同步接口函数实现
+type SyncStoreCallbackImpl = (changed: ChangedRecord) => SyncFiles | Promise<SyncFiles>;
+// store 选项
+type SyncStoreOptions = SyncStoreCallbackImpl;
 
-// 提取是否变动文件的参数
 export type ExtractChangedOptions = {
   // 带版本比较，默认为 true
   withVer?: boolean;
   // changed item 拦截
   item?: (item: ChangeFile) => ChangeFile | undefined | null;
+  // 用户自定义的文件 hash 方法，注意保持统一性，默认使用 md5
+  hash?: UserHashFileFn;
 };
+type UserHashFileFn = (path: string, item: ListFile) => MaybePromise<string>;
 
 export type OnSyncParams = {
   files: ListFilesRecord;
@@ -243,7 +250,7 @@ export type OnLogParams = {
 };
 
 // 文件排序的自定义函数
-type OrderFilesFn = (a: ListFilesRecordItem, b: ListFilesRecordItem) => number;
+type OrderFilesFn = (a: ListFile, b: ListFile) => number;
 
 // glob 额外参数
 export type ListFilesGlobOptions = Omit<GlobOptionsWithFileTypesTrue, 'stat'>;
