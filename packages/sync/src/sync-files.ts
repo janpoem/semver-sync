@@ -1,11 +1,6 @@
 import { errMsg } from '@zenstone/ts-utils/error';
 import color from 'ansi-colors';
-import type {
-  ChangedFile,
-  ChangedRecord,
-  SyncFile,
-  SyncFiles,
-} from './_types';
+import type { ChangedFile, ChangedRecord, SyncFile, SyncFiles } from './_types';
 import { reduceMicrosecond } from './_utils';
 
 export type SyncHandleFileCallback = (
@@ -48,11 +43,11 @@ export const syncFiles = (handle: SyncHandleFileCallback) => {
           color.gray(': '),
           ...(res != null
             ? [
-                color.bgGreen('[ok]'),
+                color.bgGreenBright('[ok]'),
                 color.greenBright(', '),
                 color.yellow(res.url),
               ]
-            : [color.bgRed('[err]'), color.gray(', '), color.grey(msg)]),
+            : [color.bgRedBright('[err]'), color.gray(', '), color.grey(msg)]),
           color.gray(', '),
           color.magenta(time),
         ].join(''),
