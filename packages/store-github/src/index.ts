@@ -27,7 +27,7 @@ const storeGithub = (opts: Input) => {
       const syncFile: SyncFile = {
         ver: file.ver,
         hash: file.hash,
-        url: baseUrl ? new URL(filePath, baseUrl).toString() : filePath,
+        url: baseUrl ? `//${baseUrl.host}/${filePath}` : filePath,
         type: file.type,
       };
       const params = { baseUrl, file, syncFile, result };
