@@ -34,8 +34,9 @@ npm install @semver-sync/sync @semver-sync/store-qiniu
 
 ## 说明文档
 
-- [@semver-sync/sync](https://github.com/janpoem/semver-sync/tree/main/packages/sync)
+- [@semver-sync/sync](https://github.com/janpoem/semver-sync/tree/main/packages/sync) [![version](https://img.shields.io/npm/v/@semver-sync/sync?style=for-the-badge)](https://www.npmjs.com/package/@semver-sync/sync)
 
 ### stores
 
-- [@semver-sync/store-qiniu](https://github.com/janpoem/semver-sync/tree/main/packages/store-qiniu)
+- [@semver-sync/store-qiniu](https://github.com/janpoem/semver-sync/tree/main/packages/store-qiniu) [![version](https://img.shields.io/npm/v/@semver-sync/store-qiniu?style=for-the-badge)](https://www.npmjs.com/package/@semver-sync/store-qiniu)
+- [@semver-sync/store-github](https://github.com/janpoem/semver-sync/tree/main/packages/store-github) [![version](https://img.shields.io/npm/v/@semver-sync/store-github?style=for-the-badge)](https://www.npmjs.com/package/@semver-sync/store-github)
