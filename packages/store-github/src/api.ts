@@ -3,7 +3,7 @@ import { isNumberVal } from '@zenstone/ts-utils/number';
 import { isInferObj } from '@zenstone/ts-utils/object';
 import { ProxyAgent, request } from 'undici';
 import type BodyReadable from 'undici/types/readable';
-import { Github, type StoreGithub } from './types';
+import { type Github, MediaType, type StoreGithub } from './types';
 
 type Config = StoreGithub.Config;
 type Input = StoreGithub.Input;
@@ -70,7 +70,7 @@ export const createApi = (config: Config, opts: Input) => {
 
   const makeAcceptHeader = (accept: Github.MediaTypes): [string, string] => [
     'accept',
-    Github.MediaType[accept],
+    MediaType[accept],
   ];
 
   /**

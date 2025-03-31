@@ -1,20 +1,20 @@
 import type { ChangedFile, StoreKeyOptions, SyncFile } from '@semver-sync/sync';
 
+// @see https://docs.github.com/en/rest/using-the-rest-api/getting-started-with-the-rest-api?apiVersion=2022-11-28#media-types
+export const MediaType = {
+  raw: 'application/vnd.github.raw+json',
+  html: 'application/vnd.github.html+json',
+  object: 'application/vnd.github.object+json',
+  normal: 'application/vnd.github+json',
+  default: 'application/json',
+} as const;
+
 export namespace Github {
   export type Error = {
     message: string;
     documentation_url: string;
     status: `${number}`;
   };
-
-  // @see https://docs.github.com/en/rest/using-the-rest-api/getting-started-with-the-rest-api?apiVersion=2022-11-28#media-types
-  export const MediaType = {
-    raw: 'application/vnd.github.raw+json',
-    html: 'application/vnd.github.html+json',
-    object: 'application/vnd.github.object+json',
-    normal: 'application/vnd.github+json',
-    default: 'application/json',
-  } as const;
 
   export type MediaTypes = keyof typeof MediaType;
 
