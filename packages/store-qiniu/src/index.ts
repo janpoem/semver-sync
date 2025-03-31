@@ -1,8 +1,4 @@
-import {
-  convertUploadPath,
-  type SyncFile,
-  syncFiles,
-} from '@semver-sync/sync';
+import { convertUploadPath, type SyncFile, syncFiles } from '@semver-sync/sync';
 import { errMsg } from '@zenstone/ts-utils';
 import qiniu from 'qiniu';
 import { loadConfig } from './config';
@@ -57,7 +53,7 @@ const uploadQiniu = (
   });
 };
 
-const storeQiniu = (opts: Input) => {
+export const storeQiniu = (opts: Input) => {
   const { path, withVer = true } = opts;
   const config = loadConfig(opts);
 
@@ -95,6 +91,5 @@ const storeQiniu = (opts: Input) => {
     });
   });
 };
-export default storeQiniu;
 
 export * from './types';

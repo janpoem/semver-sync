@@ -6,7 +6,7 @@ import type { StoreGithub } from './types';
 
 type Input = StoreGithub.Input;
 
-const storeGithub = (opts: Input) => {
+export const storeGithub = (opts: Input) => {
   const { path, withVer = true } = opts;
   const config = loadConfig(opts);
   const api = createApi(config, opts);
@@ -40,7 +40,5 @@ const storeGithub = (opts: Input) => {
     }
   });
 };
-
-export default storeGithub;
 
 export * from './types';

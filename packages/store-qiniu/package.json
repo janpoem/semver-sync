@@ -1,6 +1,6 @@
 {
   "name": "@semver-sync/store-qiniu",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Qiniu store sync.",
   "author": "Jiankai Zeng <janpoem@163.com>",
   "license": "MIT",

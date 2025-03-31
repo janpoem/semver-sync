@@ -1,6 +1,6 @@
 import { sync } from '@semver-sync/sync';
 import { resolve } from 'node:path';
-import storeGithub from './index';
+import { storeGithub } from './index';
 
 sync({
   entry: resolve(process.cwd(), '../../test'),

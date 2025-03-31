@@ -1,6 +1,6 @@
 {
   "name": "@semver-sync/store-github",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Github repo sync.",
   "author": "Jiankai Zeng <janpoem@163.com>",
   "license": "MIT",

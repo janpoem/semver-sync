@@ -1,6 +1,6 @@
 import { sync } from '@semver-sync/sync';
 import { resolve } from 'node:path';
-import storeGithub from './dist/esm';
+import { storeGithub } from './dist/esm';
 
 sync({
   cwd: process.cwd(),

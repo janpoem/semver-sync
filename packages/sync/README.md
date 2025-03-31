@@ -78,7 +78,7 @@ sync({
 并没有实际保存，只是模拟延时保存操作。
 
 ```ts
-import sync, { syncFiles } from '@semver-sync/sync';
+import { sync, syncFiles } from '@semver-sync/sync';
 
 function getRandomInt(min: number, max: number) {
   const minCeiled = Math.ceil(min);

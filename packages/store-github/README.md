@@ -9,7 +9,7 @@ Github 仓库存储实现，私有仓库也可以（非 public）。
 
 ```ts
 import sync from '@semver-sync/sync';
-import storeQiniu from '@semver-sync/store-github';
+import { storeQiniu } from '@semver-sync/store-github';
 
 sync({
   cwd: process.cwd(),
