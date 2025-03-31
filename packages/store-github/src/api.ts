@@ -41,6 +41,10 @@ export const createApi = (config: Config, opts: Input) => {
   const basicHeaders: [string, string][] = [
     ['authorization', `Bearer ${config.token}`],
     ['X-GitHub-Api-Version', '2022-11-28'],
+    [
+      'user-agent',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
+    ],
   ];
 
   const getProxyDispatcher = () => {
@@ -87,7 +91,7 @@ export const createApi = (config: Config, opts: Input) => {
 
     const { statusCode, body } = await request(url, {
       dispatcher: getProxyDispatcher(),
-      headers: [makeAcceptHeader('object'), ...basicHeaders],
+      headers: new Headers([makeAcceptHeader('object'), ...basicHeaders]),
     });
 
     const json = await extractJson(body);
@@ -134,7 +138,7 @@ export const createApi = (config: Config, opts: Input) => {
       dispatcher: getProxyDispatcher(),
       method: 'put',
       body: JSON.stringify(data),
-      headers: [makeAcceptHeader('normal'), ...basicHeaders],
+      headers: new Headers([makeAcceptHeader('object'), ...basicHeaders]),
     });
 
     const json = await extractJson(body);
@@ -167,7 +171,7 @@ export const createApi = (config: Config, opts: Input) => {
       dispatcher: getProxyDispatcher(),
       method: 'delete',
       body: JSON.stringify(data),
-      headers: [makeAcceptHeader('normal'), ...basicHeaders],
+      headers: new Headers([makeAcceptHeader('object'), ...basicHeaders]),
     });
 
     const json = await extractJson(body);
