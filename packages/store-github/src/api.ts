@@ -122,9 +122,11 @@ export const createApi = (config: Config, opts: Input) => {
     } catch (err) {}
 
     const url = new URL(repoPath, apiBaseUrl);
+
     const data = makeCommitBody(`${method} file ${repoPath} at ${dateStr()}`, {
-      content: btoa(content),
+      content: Buffer.from(content).toString('base64'),
     });
+
     if (notEmptyStr(branch)) data.branch = branch;
     if (notEmptyStr(sha)) data.sha = sha;
 

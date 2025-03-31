@@ -5,6 +5,8 @@ import { join, resolve } from 'node:path';
 import { dts } from 'rollup-plugin-dts';
 import swc from 'rollup-plugin-swc3';
 
+const inWatchMode = process.argv.includes('--watch');
+
 const outputDir = resolve(process.cwd(), './dist');
 const srcDir = resolve(process.cwd(), 'src');
 
@@ -39,7 +41,7 @@ export default [
       },
     ],
     plugins: [
-      rmdir(outputDir),
+      inWatchMode ? undefined : rmdir(outputDir),
       swc({
         include: /\.[mc]?[jt]sx?$/,
         exclude: /node_modules/,

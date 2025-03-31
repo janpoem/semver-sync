@@ -43,6 +43,7 @@
     "ts-check": "bunx --bun tsc --noEmit",
     "rollup": "bunx --bun rollup -c rollup.config.ts",
     "build": "bun run lint && bun run ts-check && bun run rollup",
+    "dev": "bun run rollup --watch",
     "pub": "bun publish --access public"
   },
   "dependencies": {
