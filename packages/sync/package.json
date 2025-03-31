@@ -1,6 +1,6 @@
 {
   "name": "@semver-sync/sync",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Synchronize files based on self-managed version comparison, automatically incrementing version numbers.",
   "author": "Jiankai Zeng <janpoem@163.com>",
   "license": "MIT",
@@ -44,7 +44,8 @@
     "lint": "biome lint --error-on-warnings ./src",
     "ts-check": "bunx --bun tsc --noEmit",
     "rollup": "bunx --bun rollup -c rollup.config.ts",
-    "build": "bun run lint && bun run ts-check && bun run rollup"
+    "build": "bun run lint && bun run ts-check && bun run rollup",
+    "pub": "bun publish --access public"
   },
   "dependencies": {
     "@zenstone/ts-utils": "^0.0.10",

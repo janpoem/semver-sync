@@ -2,6 +2,10 @@
   "name": "@semver-sync/repo",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "build": "bun -F './packages/*' build",
+    "pub": "bun -F './packages/*' pub"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "@biomejs/biome": "latest",
