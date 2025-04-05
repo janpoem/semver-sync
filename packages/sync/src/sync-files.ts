@@ -1,4 +1,4 @@
-import { errMsg } from '@zenstone/ts-utils/error';
+import { errMsg } from '@zenstone/ts-utils';
 import color from 'ansi-colors';
 import type { ChangedFile, ChangedRecord, SyncFile, SyncFiles } from './_types';
 import { reduceMicrosecond } from './_utils';

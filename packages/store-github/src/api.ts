@@ -1,6 +1,9 @@
-import { errMsg, notEmptyStr } from '@zenstone/ts-utils';
-import { isNumberVal } from '@zenstone/ts-utils/number';
-import { isInferObj } from '@zenstone/ts-utils/object';
+import {
+  errMsg,
+  isInferObj,
+  isNumberVal,
+  notEmptyStr,
+} from '@zenstone/ts-utils';
 import { ProxyAgent, request } from 'undici';
 import type BodyReadable from 'undici/types/readable';
 import { type Github, MediaType, type StoreGithub } from './types';
